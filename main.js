@@ -194,7 +194,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
             case Algorithm.D:
                 //TODO: implement
             case Algorithm.I:
-                Sum_e += e
+                Sum_eX += eX
+                Sum_eY += eY
                 pushX += Ki * Sum_eX
                 pushY += Ki * Sum_eY
                 // don't break!
