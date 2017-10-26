@@ -9,8 +9,14 @@ if (!String.prototype.format) {
         });
     };
 }
-var bangbang = false;
-var PID = true;
+var Algorithm = {
+    bangbang: 'bangbang',
+    P: 'P',
+    I: 'I',
+    D: 'D',
+}
+var algorithm = Algorithm.bangbang
+
 var svgns = "http://www.w3.org/2000/svg";
 document.addEventListener("DOMContentLoaded", function (event) {
 
@@ -24,21 +30,30 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const keyName = event.key;
 
         switch (keyName) {
-            case "w":
+            case "ArrowUp":
                 desiredVelY += 10
                 break;
-            case "s":
+            case "ArrowDown":
                 desiredVelY -= 10
                 break;
-            case "d":
+            case "ArrowRight":
                 desiredVelX += 10
                 break;
-            case "a":
+            case "ArrowLeft":
                 desiredVelX -= 10
                 break;
             case "b":
-                bangbang = !bangbang
-                PID = !bangbang
+                algorithm = Algorithm.bangbang
+                break;
+            case "p":
+                algorithm = Algorithm.P
+                break;
+            case "i":
+                algorithm = Algorithm.I
+                break;
+            case "d":
+                algorithm = Algorithm.D
+                break;
             default:
                 break;
         }
@@ -104,8 +119,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 velX.toFixed(2).showSign(), (desiredVelX - velX).toFixed(2).showSign(), desiredVelX.toFixed(2).showSign(), velY.toFixed(2).showSign(), (desiredVelY - velY).toFixed(2).showSign(), desiredVelY.toFixed(2).showSign())
             ht += format('<br><span style="color:green">gasX:</span> %s', forceX.toFixed(2).showSign())
             ht += format('<br><span style="color:green">gasY:</span> %s', forceY.toFixed(2).showSign())
-            ht += "<br>bangbang ? " + bangbang
-            ht += "<br>PID ? " + PID
+            ht += "<br>algorithm: " + algorithm.toString()
             variables.innerHTML = ht
             slowCount = 0;
         }
@@ -125,12 +139,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
         setTimeout(phys, 1000 / fps);
     }
 
-    var bias = (Math.random() - 0.5) * 50
-    bias += Math.sign(bias) * 50
+    // var bias = (Math.random() - 0.5) * 50
+    // bias += Math.sign(bias) * 50
 
 
     function disturb(val) {
-        return (Math.random() - 0.5) * 10 * (1 / (1 + Math.exp(-Math.abs(val)))) + bias
+        return (Math.random() - 0.5) * 10 * (1 / (1 + Math.exp(-Math.abs(val)))) // + bias
     }
     var frictionX = 0,
         frictionY = 0
@@ -138,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     // push : between 0 - 100
     function accelerator(pushX, pushY) {
         k = 0.5 // friction coefficient
-        mg = 2
+        mg = 100
 
         if (Math.abs(pushX) > 200) pushX = Math.sign(pushX) * 200
         if (Math.abs(pushY) > 200) pushY = Math.sign(pushY) * 200
@@ -163,14 +177,21 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (Math.abs(eX) < 1 / 10) eX = 0
         if (Math.abs(eY) < 1 / 10) eY = 0
 
-        if (bangbang) {
-            var pushX, pushY
-            pushX = (eX >= 0) ? 200 : -200
-            pushY = (eY >= 0) ? 200 : -200
-            accelerator(pushX + frictionX, pushY + frictionY)
-        } else if (PID) {
-            accelerator(Kp * eX + frictionX, Kp * eY + frictionY)
+        switch (algorithm) {
+            case Algorithm.bangbang:
+                var pushX, pushY
+                pushX = (eX >= 0) ? 200 : -200
+                pushY = (eY >= 0) ? 200 : -200
+                accelerator(pushX, pushY)
+                
+                break;
+            case Algorithm.P:
+                accelerator(Kp * eX, Kp * eY)
+            
+            default:
+                break;
         }
+        
     }
 
 
