@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         pose_y = 30,
         velX = 15,
         velY = 0,
-        speed = 5,
         forceX = 0,
         forceY = 0,
         eX = 0,
@@ -82,39 +81,42 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var desiredVelX = 30;
     var desiredVelY = 0;
     var slowCount = 1
-    
-    var vehicle = document.createElementNS(svgns,"circle")
+
+    var vehicle = document.createElementNS(svgns, "circle")
     vehicle.setAttribute('r', 10)
     vehicle.setAttribute('cx', 25)
     vehicle.setAttribute('cy', 25)
     vehicle.setAttribute('fill', "#222")
     svg.appendChild(vehicle)
-    
+
     // 60 fps
     persec = 4
     fps = 60
     var graphCounter = 0;
-    var chart_eX = new Chart(new Array((fps / persec)*3).fill(0),document.getElementById("eX"))
-    var last_ex = new Array(fps/persec*3).fill(0)
-    var chart_eY = new Chart(new Array((fps / persec)*3).fill(0),document.getElementById("eY"))
-    var last_ey = new Array(fps/persec*3).fill(0)
+    var chart_n = (fps / persec) * 3
+    var chart_eX = new Chart(new Array(chart_n).fill(0), document.getElementById("eX"))
+    var last_ex = new Array(chart_n).fill(0)
+    var chart_eY = new Chart(new Array(chart_n).fill(0), document.getElementById("eY"))
+    var last_ey = new Array(chart_n).fill(0)
+    
     function draw() {
         // vehicle.setAttribute()
         vehicle.setAttribute('cx', pose_x)
         vehicle.setAttribute('cy', pose_y)
-        if (graphCounter++ % 10 == 0){
+        if (graphCounter++ % (fps / persec) == 0) {
             for (var i = 0; i < last_ex.length - 1; i++) {
-                last_ex[i] = last_ex[i+1]
+                last_ex[i] = last_ex[i + 1]
             }
             for (var i = 0; i < last_ey.length - 1; i++) {
-                last_ey[i] = last_ey[i+1]
+                last_ey[i] = last_ey[i + 1]
             }
             last_ex[last_ex.length - 1] = eX
-            chart_eX.draw(last_ex,(fps/persec)*3,30)
+            chart_eX.draw(last_ex, (fps / persec) * 3, 30)
             last_ey[last_ey.length - 1] = eY
-            chart_eY.draw(last_ey,(fps/persec)*3,30)
+            chart_eY.draw(last_ey, (fps / persec) * 3, 30)
         }
         if (slowCount++ >= 3) {
+            
             var ht = format('<span style="color:green">velX:</span> %s %s\t<span style="color:green">desiredVelX:</span> %s<br><span style="color:purple">velY:</span> %s %s\t <span style="color:purple">desiredVelY:</span> %s',
                 velX.toFixed(2).showSign(), (desiredVelX - velX).toFixed(2).showSign(), desiredVelX.toFixed(2).showSign(), velY.toFixed(2).showSign(), (desiredVelY - velY).toFixed(2).showSign(), desiredVelY.toFixed(2).showSign())
             ht += format('<br><span style="color:green">gasX:</span> %s', forceX.toFixed(2).showSign())
@@ -168,30 +170,44 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
 
     var controllerCounter = 0
-
+    var Sum_eX = 0
+    var Sum_eY = 0
     function controller() {
+        pushX = 0
+        pushY = 0
         Kp = 3 * (fps / persec)
+        Ki = 1 * (fps / persec)
+        Kd = 0
+
         eX = desiredVelX - velX
         eY = desiredVelY - velY
 
         if (Math.abs(eX) < 1 / 10) eX = 0
         if (Math.abs(eY) < 1 / 10) eY = 0
 
+        var pushX, pushY
         switch (algorithm) {
             case Algorithm.bangbang:
-                var pushX, pushY
                 pushX = (eX >= 0) ? 200 : -200
                 pushY = (eY >= 0) ? 200 : -200
-                accelerator(pushX, pushY)
-                
                 break;
+            case Algorithm.D:
+                //TODO: implement
+            case Algorithm.I:
+                Sum_e += e
+                pushX += Ki * Sum_eX
+                pushY += Ki * Sum_eY
+                // don't break!
             case Algorithm.P:
-                accelerator(Kp * eX, Kp * eY)
-            
+                pushX += Kp * eX
+                pushY += Kp * eY
+                break;
             default:
                 break;
-        }
-        
+
+            }
+            accelerator(pushX, pushY)
+
     }
 
 
@@ -202,12 +218,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 
 
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 
 
 
@@ -225,23 +241,23 @@ class Chart {
         this.lines = []
         this.svg = svg
         for (var i = 1; i < array.length; i++) {
-            var c = document.createElementNS(svgns,"line")
-            c.setAttribute('stroke',"#000")
-            c.setAttribute('stroke-width',"1")
+            var c = document.createElementNS(svgns, "line")
+            c.setAttribute('stroke', "#000")
+            c.setAttribute('stroke-width', "1")
             c.setAttribute('opacity', "0.5")
             this.svg.appendChild(c)
             this.lines.push(c)
         }
-        
+
         this.svg.appendChild(c)
         for (var i = 0; i < array.length; i++) {
-            var c = document.createElementNS(svgns,"circle")
+            var c = document.createElementNS(svgns, "circle")
             c.setAttribute('r', 1)
             this.svg.appendChild(c)
             this.points.push(c)
         }
-        this.draw = function(array, rangeX, rangeY){
-            var h =  this.svg.height.animVal.value / 2
+        this.draw = function (array, rangeX, rangeY) {
+            var h = this.svg.height.animVal.value / 2
             var yy = this.svg.height.animVal.value / rangeY / 2
             var xx = this.svg.width.animVal.value / rangeX
             // for (var i = 0; i < array.length; i++) {
@@ -251,18 +267,18 @@ class Chart {
             // console.log(this.svg.getBoundingClientRect().width / rangeX)
             for (var i = 0; i < array.length - 1; i++) {
                 var y1 = array[i] * yy + h
-                var y2 = array[i+1] * yy + h
+                var y2 = array[i + 1] * yy + h
                 var x1 = i * xx
-                var x2 = (i+1) * xx
-                this.lines[i].setAttribute("y1",y1)
-                this.lines[i].setAttribute("y2",y2)
-                this.lines[i].setAttribute("x1",x1)
-                this.lines[i].setAttribute("x2",x2)
-                
+                var x2 = (i + 1) * xx
+                this.lines[i].setAttribute("y1", y1)
+                this.lines[i].setAttribute("y2", y2)
+                this.lines[i].setAttribute("x1", x1)
+                this.lines[i].setAttribute("x2", x2)
+
             }
         }
-        
-        this.draw(array, (fps/persec)*3, 200)
+
+        this.draw(array, (fps / persec) * 3, 200)
     }
 }
 
