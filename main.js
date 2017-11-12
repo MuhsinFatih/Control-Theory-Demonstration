@@ -21,10 +21,22 @@ var svgns = "http://www.w3.org/2000/svg";
 document.addEventListener("DOMContentLoaded", function (event) {
 
     var svg = document.getElementById("svg");
-
+    var runstop = document.getElementById("runstop");
+    var frictionCB = document.getElementById("friction");
     var variables = document.getElementById("info");
     variables.style.fontFamily = "Menlo"
     // variables.style.fontWeight = "bold"
+    runstop.addEventListener('click', function() {
+        if (run) run = false
+        else {
+            run = true
+            phys();
+        }
+    })
+
+    frictionCB.addEventListener('click', function() {
+        useFriction = !useFriction
+    })
 
     document.addEventListener('keydown', (event) => {
         const keyName = event.key;
@@ -127,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         }
     }
 
+    var run = true
     function phys() {
         var rect = svg.getBoundingClientRect()
         if (pose_x < 0) pose_x = rect.width - pose_x;
@@ -134,16 +147,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
         pose_x = (pose_x + velX / 10) % rect.width
         pose_y = (pose_y + (-velY) / 10) % rect.height
 
-        if (controllerCounter++ % (fps / persec) == 0) controller();
+        if (controllerCounter++ % (fps / persec) == 0) controller(persec/fps);
 
         draw();
-
-        setTimeout(phys, 1000 / fps);
+        if(run) setTimeout(phys, 1000 / fps);
     }
 
     // var bias = (Math.random() - 0.5) * 50
     // bias += Math.sign(bias) * 50
 
+    var useFriction = true
 
     function disturb(val) {
         return (Math.random() - 0.5) * 10 * (1 / (1 + Math.exp(-Math.abs(val)))) // + bias
@@ -159,12 +172,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
         if (Math.abs(pushX) > 200) pushX = Math.sign(pushX) * 200
         if (Math.abs(pushY) > 200) pushY = Math.sign(pushY) * 200
 
-        frictionX = (velX >= 0 ? k * mg : -k * mg)
-        frictionY = (velY >= 0 ? k * mg : -k * mg)
-        forceX = pushX - frictionX // sigmoid error rate
+        friction = k * mg
+        // if(Math.abs(pushX) > Math.abs(friction))
+        forceX = pushX - (useFriction ? Math.sign(velX) * friction : 0) // sigmoid error rate
         velX += (forceX + disturb(velX)) * 1 / fps
 
-        forceY = pushY - frictionY // sigmoid error rate
+        // if(Math.abs(pushY) > Math.abs(friction))
+        forceY = pushY - (useFriction ? Math.sign(velY) * friction : 0) // sigmoid error rate
         velY += (forceY + disturb(velY)) * 1 / fps
 
     }
@@ -172,41 +186,58 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var controllerCounter = 0
     var Sum_eX = 0
     var Sum_eY = 0
-    function controller() {
+    var last_eX = 0
+    var last_eY = 0
+    var last1sec = []
+
+    function controller(dt) {
         pushX = 0
         pushY = 0
-        Kp = 3 * (fps / persec)
-        Ki = 1 * (fps / persec)
-        Kd = 0
-
+        Kp = 300 * dt
+        Ki = 10 * dt
+        Kd = 70 * dt
+        var Px = 0, Py = 0
+        var Ix = 0, Iy = 0
+        var Dx = 0, Dy = 0
         eX = desiredVelX - velX
         eY = desiredVelY - velY
 
         if (Math.abs(eX) < 1 / 10) eX = 0
         if (Math.abs(eY) < 1 / 10) eY = 0
 
-        var pushX, pushY
+        var pushX = 0, pushY = 0
         switch (algorithm) {
             case Algorithm.bangbang:
+
                 pushX = (eX >= 0) ? 200 : -200
                 pushY = (eY >= 0) ? 200 : -200
                 break;
             case Algorithm.D:
-                //TODO: implement
+                Dx = Kd * (eX - last_eX) / dt
+                Dy = Kd * (eY - last_eY) / dt
+                // don't break!
             case Algorithm.I:
+                Ix = Ki * Sum_eX
+                Iy = Ki * Sum_eY
                 Sum_eX += eX
                 Sum_eY += eY
-                pushX += Ki * Sum_eX
-                pushY += Ki * Sum_eY
                 // don't break!
             case Algorithm.P:
-                pushX += Kp * eX
-                pushY += Kp * eY
+                Px = Kp * eX
+                Py = Kp * eY
                 break;
             default:
                 break;
 
             }
+            pushX += Px + Ix + Dx
+            pushY += Py + Iy + Dy
+            // console.log(Sum_eX)
+            // console.log("last_ex: " + last_eX + "   eX: " + eX + "Kd * (eX - last_eX): " + Kd * (eX - last_eX) + "\n")
+            console.log("p gain: " + Px + "   i gain: " + Ix + "    d gain: " + Dx + "    total gain: " + pushX)
+            //if(Math.sign(eX) != Math.sign(Sum_eX) || Math.abs(Sum_eX) < 100)
+            last_eX = eX
+            last_eY = eY
             accelerator(pushX, pushY)
 
     }
