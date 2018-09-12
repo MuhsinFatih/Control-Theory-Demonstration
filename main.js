@@ -4,27 +4,27 @@ if (!String.prototype.format) {
         var args = arguments;
         return this.replace(/{(\d+)}/g, function (match, number) {
             return typeof args[number] != 'undefined' ?
-                args[number] :
+                args[number]: 
                 match;
         });
     };
 }
 var Algorithm = {
     bangbang: 'bangbang',
-    P: 'P',
-    I: 'I',
-    D: 'D',
+    P       : 'P',
+    I       : 'I',
+    D       : 'D',
 }
 var algorithm = Algorithm.bangbang
 
 var svgns = "http://www.w3.org/2000/svg";
 document.addEventListener("DOMContentLoaded", function (event) {
 
-    var svg = document.getElementById("svg");
-    var runstop = document.getElementById("runstop");
-    var frictionCB = document.getElementById("friction");
-    var variables = document.getElementById("info");
-    variables.style.fontFamily = "Menlo"
+    var svg                        = document.getElementById("svg");
+    var runstop                    = document.getElementById("runstop");
+    var frictionCB                 = document.getElementById("friction");
+    var variables                  = document.getElementById("info");
+        variables.style.fontFamily = "Menlo"
     // variables.style.fontWeight = "bold"
     runstop.addEventListener('click', function() {
         if (run) run = false
@@ -42,31 +42,31 @@ document.addEventListener("DOMContentLoaded", function (event) {
         const keyName = event.key;
 
         switch (keyName) {
-            case "ArrowUp":
+            case "ArrowUp": 
                 desiredVelY += 10
                 break;
-            case "ArrowDown":
+            case "ArrowDown": 
                 desiredVelY -= 10
                 break;
-            case "ArrowRight":
+            case "ArrowRight": 
                 desiredVelX += 10
                 break;
-            case "ArrowLeft":
+            case "ArrowLeft": 
                 desiredVelX -= 10
                 break;
-            case "b":
+            case "b": 
                 algorithm = Algorithm.bangbang
                 break;
-            case "p":
+            case "p": 
                 algorithm = Algorithm.P
                 break;
-            case "i":
+            case "i": 
                 algorithm = Algorithm.I
                 break;
-            case "d":
+            case "d": 
                 algorithm = Algorithm.D
                 break;
-            default:
+            default: 
                 break;
         }
 
@@ -81,18 +81,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
     var targetX = 0,
         targetY = 0,
-        pose_x = 30,
-        pose_y = 30,
-        velX = 15,
-        velY = 0,
-        forceX = 0,
-        forceY = 0,
-        eX = 0,
-        eY = 0;
+        pose_x  = 30,
+        pose_y  = 30,
+        velX    = 15,
+        velY    = 0,
+        forceX  = 0,
+        forceY  = 0,
+        eX      = 0,
+        eY      = 0;
 
     var desiredVelX = 30;
     var desiredVelY = 0;
-    var slowCount = 1
+    var slowCount   = 1
 
     var vehicle = document.createElementNS(svgns, "circle")
     vehicle.setAttribute('r', 10)
@@ -102,14 +102,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.appendChild(vehicle)
 
     // 60 fps
-    persec = 4
-    fps = 60
+        persec       = 4
+        fps          = 60
     var graphCounter = 0;
-    var chart_n = (fps / persec) * 3
-    var chart_eX = new Chart(new Array(chart_n).fill(0), document.getElementById("eX"))
-    var last_ex = new Array(chart_n).fill(0)
-    var chart_eY = new Chart(new Array(chart_n).fill(0), document.getElementById("eY"))
-    var last_ey = new Array(chart_n).fill(0)
+    var chart_n      = (fps / persec) * 3
+    var chart_eX     = new Chart(new Array(chart_n).fill(0), document.getElementById("eX"))
+    var last_ex      = new Array(chart_n).fill(0)
+    var chart_eY     = new Chart(new Array(chart_n).fill(0), document.getElementById("eY"))
+    var last_ey      = new Array(chart_n).fill(0)
     
     function draw() {
         // vehicle.setAttribute()
@@ -131,21 +131,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
             
             var ht = format('<span style="color:green">velX:</span> %s %s\t<span style="color:green">desiredVelX:</span> %s<br><span style="color:purple">velY:</span> %s %s\t <span style="color:purple">desiredVelY:</span> %s',
                 velX.toFixed(2).showSign(), (desiredVelX - velX).toFixed(2).showSign(), desiredVelX.toFixed(2).showSign(), velY.toFixed(2).showSign(), (desiredVelY - velY).toFixed(2).showSign(), desiredVelY.toFixed(2).showSign())
-            ht += format('<br><span style="color:green">gasX:</span> %s', forceX.toFixed(2).showSign())
-            ht += format('<br><span style="color:green">gasY:</span> %s', forceY.toFixed(2).showSign())
-            ht += "<br>algorithm: " + algorithm.toString()
-            variables.innerHTML = ht
-            slowCount = 0;
+            ht                  += format('<br><span style="color:green">gasX:</span> %s', forceX.toFixed(2).showSign())
+            ht                  += format('<br><span style="color:green">gasY:</span> %s', forceY.toFixed(2).showSign())
+            ht                  += "<br>algorithm: " + algorithm.toString()
+            ht                  += "<br>(change with buttons: B / P / I / D)"
+            variables.innerHTML  = ht
+            slowCount            = 0;
         }
     }
 
     var run = true
     function phys() {
-        var rect = svg.getBoundingClientRect()
-        if (pose_x < 0) pose_x = rect.width - pose_x;
-        if (pose_y < 0) pose_y = rect.height - pose_y;
-        pose_x = (pose_x + velX / 10) % rect.width
-        pose_y = (pose_y + (-velY) / 10) % rect.height
+        var rect                = svg.getBoundingClientRect()
+        if  (pose_x < 0) pose_x = rect.width - pose_x;
+        if  (pose_y < 0) pose_y = rect.height - pose_y;
+            pose_x              = (pose_x + velX / 10) % rect.width
+            pose_y              = (pose_y + (-velY) / 10) % rect.height
 
         if (controllerCounter++ % (fps / persec) == 0) controller(persec/fps);
 
@@ -163,10 +164,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
     }
     var frictionX = 0,
         frictionY = 0
-    var maxAccel = 200
+    var maxAccel  = 200
     // push : between 0 - 100
     function accelerator(pushX, pushY) {
-        k = 0.5 // friction coefficient
+        k  = 0.5  // friction coefficient
         mg = 100
 
         if (Math.abs(pushX) > 200) pushX = Math.sign(pushX) * 200
@@ -174,59 +175,59 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
         friction = k * mg
         // if(Math.abs(pushX) > Math.abs(friction))
-        forceX = pushX - (useFriction ? Math.sign(velX) * friction : 0) // sigmoid error rate
-        velX += (forceX + disturb(velX)) * 1 / fps
+        forceX  = pushX - (useFriction ? Math.sign(velX) * friction : 0)  // sigmoid error rate
+        velX   += (forceX + disturb(velX)) * 1 / fps
 
         // if(Math.abs(pushY) > Math.abs(friction))
-        forceY = pushY - (useFriction ? Math.sign(velY) * friction : 0) // sigmoid error rate
-        velY += (forceY + disturb(velY)) * 1 / fps
+        forceY  = pushY - (useFriction ? Math.sign(velY) * friction : 0)  // sigmoid error rate
+        velY   += (forceY + disturb(velY)) * 1 / fps
 
     }
 
     var controllerCounter = 0
-    var Sum_eX = 0
-    var Sum_eY = 0
-    var last_eX = 0
-    var last_eY = 0
-    var last1sec = []
+    var Sum_eX            = 0
+    var Sum_eY            = 0
+    var last_eX           = 0
+    var last_eY           = 0
+    var last1sec          = []
 
     function controller(dt) {
-        pushX = 0
-        pushY = 0
-        Kp = 300 * dt
-        Ki = 10 * dt
-        Kd = 70 * dt
-        var Px = 0, Py = 0
-        var Ix = 0, Iy = 0
-        var Dx = 0, Dy = 0
-        eX = desiredVelX - velX
-        eY = desiredVelY - velY
+            pushX = 0
+            pushY = 0
+            Kp    = 300 * dt
+            Ki    = 10 * dt
+            Kd    = 70 * dt
+        var Px    = 0, Py = 0
+        var Ix    = 0, Iy = 0
+        var Dx    = 0, Dy = 0
+            eX    = desiredVelX - velX
+            eY    = desiredVelY - velY
 
         if (Math.abs(eX) < 1 / 10) eX = 0
         if (Math.abs(eY) < 1 / 10) eY = 0
 
         var pushX = 0, pushY = 0
         switch (algorithm) {
-            case Algorithm.bangbang:
+            case Algorithm.bangbang: 
 
                 pushX = (eX >= 0) ? 200 : -200
                 pushY = (eY >= 0) ? 200 : -200
                 break;
-            case Algorithm.D:
+            case Algorithm.D: 
                 Dx = Kd * (eX - last_eX) / dt
                 Dy = Kd * (eY - last_eY) / dt
                 // don't break!
-            case Algorithm.I:
-                Ix = Ki * Sum_eX
-                Iy = Ki * Sum_eY
+            case Algorithm.I: 
+                Ix      = Ki * Sum_eX
+                Iy      = Ki * Sum_eY
                 Sum_eX += eX
                 Sum_eY += eY
                 // don't break!
-            case Algorithm.P:
+            case Algorithm.P: 
                 Px = Kp * eX
                 Py = Kp * eY
                 break;
-            default:
+            default: 
                 break;
 
             }
@@ -270,8 +271,8 @@ class Chart {
     // svg = null
     constructor(array, svg) {
         this.points = []
-        this.lines = []
-        this.svg = svg
+        this.lines  = []
+        this.svg    = svg
         for (var i = 1; i < array.length; i++) {
             var c = document.createElementNS(svgns, "line")
             c.setAttribute('stroke', "#000")
@@ -289,7 +290,7 @@ class Chart {
             this.points.push(c)
         }
         this.draw = function (array, rangeX, rangeY) {
-            var h = this.svg.height.animVal.value / 2
+            var h  = this.svg.height.animVal.value / 2
             var yy = this.svg.height.animVal.value / rangeY / 2
             var xx = this.svg.width.animVal.value / rangeX
             // for (var i = 0; i < array.length; i++) {
@@ -316,14 +317,14 @@ class Chart {
 
 
 function format(fmt) {
-    var argIndex = 1 // skip initial format argument
+    var argIndex = 1  // skip initial format argument
         ,
-        args = [].slice.call(arguments),
-        i = 0,
-        n = fmt.length,
-        result = '',
-        c, escaped = false,
-        arg, tmp, leadingZero = false,
+                  args     = [].slice.call(arguments),
+                  i        = 0,
+                  n        = fmt.length,
+                  result   = '',
+        c        , escaped = false,
+        arg      , tmp,     leadingZero               = false,
         precision, nextArg = function () {
             return args[argIndex++];
         },
@@ -331,7 +332,7 @@ function format(fmt) {
             var digits = '';
             while (/\d/.test(fmt[i])) {
                 digits += fmt[i++];
-                c = fmt[i];
+                c       = fmt[i];
             }
             return digits.length > 0 ? parseInt(digits) : null;
         };
@@ -341,49 +342,49 @@ function format(fmt) {
             escaped = false;
             if (c == '.') {
                 leadingZero = false;
-                c = fmt[++i];
+                c           = fmt[++i];
             } else if (c == '0' && fmt[i + 1] == '.') {
-                leadingZero = true;
-                i += 2;
-                c = fmt[i];
+                leadingZero  = true;
+                i           += 2;
+                c            = fmt[i];
             } else {
                 leadingZero = true;
             }
             precision = slurpNumber();
             switch (c) {
-                case 'b': // number in binary
+                case 'b':   // number in binary
                     result += parseInt(nextArg(), 10).toString(2);
                     break;
-                case 'c': // character
+                case 'c':   // character
                     arg = nextArg();
                     if (typeof arg === 'string' || arg instanceof String)
                         result += arg;
                     else
                         result += String.fromCharCode(parseInt(arg, 10));
                     break;
-                case 'd': // number in decimal
+                case 'd':   // number in decimal
                     result += parseInt(nextArg(), 10);
                     break;
-                case 'f': // floating point number
-                    tmp = String(parseFloat(nextArg()).toFixed(precision || 6));
+                case 'f':   // floating point number
+                    tmp     = String(parseFloat(nextArg()).toFixed(precision || 6));
                     result += leadingZero ? tmp : tmp.replace(/^0/, '');
                     break;
-                case 'j': // JSON
+                case 'j':   // JSON
                     result += JSON.stringify(nextArg());
                     break;
-                case 'o': // number in octal
+                case 'o':   // number in octal
                     result += '0' + parseInt(nextArg(), 10).toString(8);
                     break;
-                case 's': // string
+                case 's':   // string
                     result += nextArg();
                     break;
-                case 'x': // lowercase hexadecimal
+                case 'x':   // lowercase hexadecimal
                     result += '0x' + parseInt(nextArg(), 10).toString(16);
                     break;
-                case 'X': // uppercase hexadecimal
+                case 'X':   // uppercase hexadecimal
                     result += '0x' + parseInt(nextArg(), 10).toString(16).toUpperCase();
                     break;
-                default:
+                default: 
                     result += c;
                     break;
             }
