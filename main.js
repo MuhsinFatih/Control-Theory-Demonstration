@@ -102,14 +102,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.appendChild(vehicle)
 
     // 60 fps
-        persec       = 4
-        fps          = 60
-    var graphCounter = 0;
-    var chart_n      = (fps / persec) * 3
-    var chart_eX     = new Chart(new Array(chart_n).fill(0), document.getElementById("eX"))
-    var last_ex      = new Array(chart_n).fill(0)
-    var chart_eY     = new Chart(new Array(chart_n).fill(0), document.getElementById("eY"))
-    var last_ey      = new Array(chart_n).fill(0)
+            persec       = 4
+            fps          = 60
+        var graphCounter = 0;
+        var chart_n      = (fps / persec) * 3
+        var chart_eX     = new Chart(new Array(chart_n).fill(0), document.getElementById("eX"))
+        var last_ex      = new Array(chart_n).fill(0)
+        var chart_eY     = new Chart(new Array(chart_n).fill(0), document.getElementById("eY"))
+        var last_ey      = new Array(chart_n).fill(0)
     
     function draw() {
         // vehicle.setAttribute()
@@ -192,16 +192,16 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var last1sec          = []
 
     function controller(dt) {
-            pushX = 0
-            pushY = 0
-            Kp    = 300 * dt
-            Ki    = 10 * dt
-            Kd    = 70 * dt
-        var Px    = 0, Py = 0
-        var Ix    = 0, Iy = 0
-        var Dx    = 0, Dy = 0
-            eX    = desiredVelX - velX
-            eY    = desiredVelY - velY
+                pushX = 0
+                pushY = 0
+                Kp    = 300 * dt
+                Ki    = 10 * dt
+                Kd    = 70 * dt
+            var Px    = 0, Py = 0
+            var Ix    = 0, Iy = 0
+            var Dx    = 0, Dy = 0
+                eX    = desiredVelX - velX
+                eY    = desiredVelY - velY
 
         if (Math.abs(eX) < 1 / 10) eX = 0
         if (Math.abs(eY) < 1 / 10) eY = 0
@@ -214,8 +214,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 pushY = (eY >= 0) ? 200 : -200
                 break;
             case Algorithm.D: 
-                Dx = Kd * (eX - last_eX) / dt
-                Dy = Kd * (eY - last_eY) / dt
+                Dx = Kd * (eX - last_eX) * dt
+                Dy = Kd * (eY - last_eY) * dt
                 // don't break!
             case Algorithm.I: 
                 Ix      = Ki * Sum_eX
@@ -319,13 +319,13 @@ class Chart {
 function format(fmt) {
     var argIndex = 1  // skip initial format argument
         ,
-                  args     = [].slice.call(arguments),
-                  i        = 0,
-                  n        = fmt.length,
-                  result   = '',
-        c        , escaped = false,
-        arg      , tmp,     leadingZero               = false,
-        precision, nextArg = function () {
+                            args     = [].slice.call(arguments),
+                            i        = 0,
+                            n        = fmt.length,
+                            result   = '',
+                  c         ,         escaped                   = false,
+                  arg       ,         tmp,                       leadingZero = false,
+                  precision, nextArg = function () {
             return args[argIndex++];
         },
         slurpNumber = function () {
